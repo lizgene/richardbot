@@ -1,0 +1,14 @@
+[
+    {
+        "time" : "30 9 * * 1-5",
+        "msg" : "Good morning! Time to get moving!"
+    },
+    {
+        "time" : "* * * * *",
+        "msg" : "Excuse me while I incessantly post here every minute. HELLOO!"
+    },
+    {
+        "time": "30 11,13,16 * * 1-5",
+        "event": "exercise:reminder"
+    }
+]
