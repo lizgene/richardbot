@@ -5,7 +5,7 @@
     },
     {
         "time" : "* * * * *",
-        "msg" : "Excuse me while I incessantly post here every minute. HELLOO!"
+        "event" : "exercise:reminder"
     },
     {
         "time": "30 11,13,16 * * 1-5",

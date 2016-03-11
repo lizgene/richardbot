@@ -11,4 +11,5 @@
 module.exports = (robot) ->
 
   robot.on "exercise:reminder", (status_reminder) ->
-    robot.send { room: "exercise" }, "Everybody exercise!"
+    name = "liz"
+    robot.send { room: "exercise" }, "#{name} exercise!"
