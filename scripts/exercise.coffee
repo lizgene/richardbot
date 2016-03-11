@@ -78,7 +78,7 @@ module.exports = (robot) ->
     richard.remove user
     msg.send "Removed user: #{user}"
 
-  robot.hear /done$/i, (msg)  ->
+  robot.hear /done/i, (msg)  ->
     user = msg.message.user.name
     richard.increment user
     msg.send "#{user} #{richard.finishedResponse()}"
