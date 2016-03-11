@@ -60,11 +60,11 @@ module.exports = (robot) ->
       message.push "#{user.name} - #{user.score}"
     msg.send message.join("\n")
 
-  robot.on "exercise:reminder", (msg) ->
-    message = ["Everybody up!!! It's time to exercise!!!!"]
+  robot.on "exercise:reminder", (reminder) ->
+    message = ["This is a fully automated exercise reminder."]
     for user, rank in richard.list()
       message.push "#{user.name}"
-    robot.send message.join(" ")
+    robot.send { room: "exercise" }, message.join(" ")
 
   robot.respond /terminate/, (msg) ->
     message = ["Everybody up!!! It's time to exercise!!!!"]

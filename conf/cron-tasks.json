@@ -4,7 +4,7 @@
         "msg" : "Good morning! Time to get moving!"
     },
     {
-        "time": "30 11,13,16,18 * * *",
+        "time": "* * * * *",
         "event": "exercise:reminder"
     }
 ]
