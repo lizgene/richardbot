@@ -1,0 +1,36 @@
+[
+    {
+      "title" : "Sun Salutations",
+      "description" : "Practice your sun salutations with Miriam.",
+      "repetitions" : null,
+      "groups" : ["yoga", "fitness"]
+    },
+    {
+      "title" : "Mini Meditation",
+      "description" : "Healthy in body and mind. Find a quiet place for a 10-minute breathing meditation.",
+      "repetitions" : null,
+      "groups" : ["yoga", "fitness"]
+    },
+    {
+      "title" : "Boat pose",
+      "description" : "Balance on your butt with shoulders back and feet off the floor. Straighten your legs or rotate your torso for a challenge!",
+      "repetitions" : {
+        "beginner" : "2x 30 seconds",
+        "intermediate" : "2x 45 seconds",
+        "advanced" : "2x 60 seconds"
+      },
+      "groups" : ["abs", "fitness", "yoga"]
+    },
+    {
+      "title" : "Sit-ups",
+      "description" : "Form is key! Keep your lower back down close to the floor.",
+      "repetitions" : { "beginner" : 15, "intermediate" : 30, "advanced" : 50 },
+      "groups" : ["abs", "fitness"]
+    },
+    {
+      "title" : "Walk Around the Block",
+      "description" : "Head outside for some fresh air, even if it's raining!",
+      "repetitions" : null,
+      "groups" : ["walking"]
+    }
+]

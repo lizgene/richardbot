@@ -1,0 +1,26 @@
+[
+    {
+        "slug" : "yoga",
+        "title" : "The Yoga Group",
+        "description" : "For all the yogis in the office. Healthy body and mind.",
+        "schedule" : "30 9,15 * * 1-5"
+    },
+    {
+        "slug" : "powerabs",
+        "title" : "Power Abs",
+        "description" : "You'll have a 6-pack by Christmas. Guaranteed.*",
+        "schedule" : "30 10,14 * * 1-5"
+    },
+    {
+      "slug" : "fitness",
+      "title" : "Springest Fitness Club",
+      "description" : "A simple fitness group for all exercisers everywhere.",
+      "schedule" : "15 10,14 * * 1-5"
+    },
+    {
+      "slug" : "walking",
+      "title" : "Springest Walking Club",
+      "description" : "Join us for our daily afternoon walk!",
+      "schedule" : "0 12 * * 1-5"
+    }
+]
