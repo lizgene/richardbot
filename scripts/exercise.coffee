@@ -108,10 +108,10 @@ module.exports = (robot) ->
   # Source: https://github.com/github/hubot/issues/844
   ###############################
 
-  # robot.hear /hello|hi|hoi/, (msg) ->
-  #   user = msg.message.user.name
-  #   message = "Hi #{user}, I'm Richard! I'm your helpful exercise bot!"
-  #   msg.send message
+  robot.hear /hello/, (msg) ->
+    user = msg.message.user.name
+    message = "hello #{user}"
+    msg.send message
 
   robot.respond /random/, (msg) ->
     message = ["Random Exercise:"]
