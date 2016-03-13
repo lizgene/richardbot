@@ -47,7 +47,7 @@ class Exercise
 
   increment: (username) ->
     user = @users[username]
-    @addnew(username) if !user
+    @add(username) if !user
     @activate(username) if !(user.status == "active")
     user.score += 1
     @robot.brain.data.users = @users
@@ -140,7 +140,7 @@ module.exports = (robot) ->
 
   robot.respond /add user (\S+[^-\s])$/i, (msg) ->
     username = msg.match[1].toLowerCase()
-    richard.addnew username
+    richard.add username
     msg.send "Added user: #{username}"
 
   robot.respond /list users/i, (msg) ->
