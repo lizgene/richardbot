@@ -50,6 +50,8 @@ class Exercise
     @add(username) if !user
     @activate(username) if !(user.status == "active")
     user.score += 1
+    timestamp = new Date().toUTCString();
+    user.last_exercised_at = timestamp
     @robot.brain.data.users = @users
 
   activate: (username) ->
@@ -57,15 +59,16 @@ class Exercise
     preferences.status = "active"
     @robot.brain.data.users = @users
 
-  # Update last_exercised_at with date
   add: (username) ->
     return @activate(username) if @users[username]
+    # TODO: This needs to be refactored so we're saving users as an array of
+    # dictionaries, none of this hashtable BS with key as name.
     @users[username] = {
+      "name" : username
       "score" : 0,
       "status" : "active",
       "groups" : "fitness",
-      "last_exercised_at" : "TBD",
-      "level" : "beginner"
+      "last_exercised_at" : "TBD"
     }
     @robot.brain.data.users = @users
     return @users[username]
@@ -74,7 +77,11 @@ class Exercise
     user_list = []
     for name, preferences of @users
       unless preferences.status != "active"
-        user_list.push({ name: name, score: preferences.score })
+        user_list.push({
+          name: name,
+          score: preferences.score,
+          last_exercised_at: preferences.last_exercised_at,
+        })
     return user_list
 
   finishedResponse: ->
@@ -145,8 +152,8 @@ module.exports = (robot) ->
 
   robot.respond /list users/i, (msg) ->
     message = ["The Exercisers:"]
-    for user, rank in richard.list()
-      message.push "#{user.name} - #{user.score}"
+    for user in richard.list()
+      message.push "#{user.name} - *Score:* #{user.score}, *Last Exercised:* #{user.last_exercised_at}"
     msg.send message.join("\n")
 
   robot.respond /terminate/, (msg) ->
