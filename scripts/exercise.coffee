@@ -151,7 +151,7 @@ module.exports = (robot) ->
     msg.send "Added user: #{username}"
 
   robot.respond /list users/i, (msg) ->
-    message = ["The Exercisers:"]
+    message = ["The Springercisers:"]
     for user in richard.list()
       message.push "#{user.name} - *Score:* #{user.score}, *Last Exercised:* #{user.last_exercised_at}"
     msg.send message.join("\n")
@@ -162,7 +162,7 @@ module.exports = (robot) ->
       message.push "#{user.name}"
     msg.send message.join(" ")
 
-  robot.respond /remove user (\S+[^-\s])$/i, (msg) ->
+  robot.respond /remove (\S+[^-\s])$/i, (msg) ->
     user = msg.match[1].toLowerCase()
     richard.remove user
     msg.send "Removed user: #{user}"
