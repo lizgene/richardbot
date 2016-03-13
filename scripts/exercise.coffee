@@ -11,7 +11,7 @@
 class Exercise
 
   constructor: (@robot) ->
-    @cache = {}
+    # Load in data for groups and exercises
     Fs = require 'fs'
     Path = require 'path'
 
@@ -22,6 +22,12 @@ class Exercise
     exercisesFilePath = Path.resolve ".", "data", "exercises.json"
     Fs.readFile exercisesFilePath, (err, data) =>
       @exercises = JSON.parse data
+
+    # Set cache for richard to save user data
+    @users = {}
+    @robot.brain.on 'loaded', =>
+      if @robot.brain.data.exercise
+        @users = @robot.brain.data.users
 
     @finished_responses = [
       "is fabuloooous!",
@@ -34,24 +40,42 @@ class Exercise
       "woke up. worked out. kicked ass."
     ]
 
-    @robot.brain.on 'loaded', =>
-      if @robot.brain.data.exercise
-        @cache = @robot.brain.data.exercise
+  remove: (username) ->
+    user = @users[username]
+    user.status = "inactive"
+    @robot.brain.data.users = @users
 
-  remove: (thing) ->
-    delete @cache[thing]
-    @robot.brain.data.exercise = @cache
+  increment: (username) ->
+    user = @users[username]
+    @addnew(username) if !user
+    @activate(username) if !(user.status == "active")
+    user.score += 1
+    @robot.brain.data.users = @users
 
-  increment: (thing) ->
-    @cache[thing] ?= 0
-    @cache[thing] += 1
-    @robot.brain.data.exercise = @cache
+  activate: (username) ->
+    preferences = @users[username]
+    preferences.status = "active"
+    @robot.brain.data.users = @users
+
+  # Update last_exercised_at with date
+  add: (username) ->
+    return @activate(username) if @users[username]
+    @users[username] = {
+      "score" : 0,
+      "status" : "active",
+      "groups" : "fitness",
+      "last_exercised_at" : "TBD",
+      "level" : "beginner"
+    }
+    @robot.brain.data.users = @users
+    return @users[username]
 
   list: ->
-    my_list = []
-    for key, value of @cache
-      my_list.push({ name: key, score: value })
-    return my_list
+    user_list = []
+    for name, preferences of @users
+      unless preferences.status != "active"
+        user_list.push({ name: name, score: preferences.score })
+    return user_list
 
   finishedResponse: ->
     @finished_responses[Math.floor(Math.random() * @finished_responses.length)]
@@ -66,7 +90,7 @@ class Exercise
     # group = @groups.filter(group) ->
     #   group.slug == slug
     # TODO: Implement new data model for users
-    return @cache.keys
+    return @users.keys
 
   getRandomExercise: (slug) ->
     exercises = @exercises.filter (exercise) ->
@@ -115,9 +139,9 @@ module.exports = (robot) ->
   #############################
 
   robot.respond /add user (\S+[^-\s])$/i, (msg) ->
-    user = msg.match[1].toLowerCase()
-    richard.increment user
-    msg.send "Added user: #{user}"
+    username = msg.match[1].toLowerCase()
+    richard.addnew username
+    msg.send "Added user: #{username}"
 
   robot.respond /list users/i, (msg) ->
     message = ["The Exercisers:"]
@@ -132,7 +156,6 @@ module.exports = (robot) ->
     msg.send message.join(" ")
 
   robot.respond /remove user (\S+[^-\s])$/i, (msg) ->
-    # user = msg.message.user.name
     user = msg.match[1].toLowerCase()
     richard.remove user
     msg.send "Removed user: #{user}"
