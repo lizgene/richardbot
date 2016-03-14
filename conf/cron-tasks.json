@@ -1,7 +1,7 @@
 [
     {
         "time" : "30 9 * * 1-5",
-        "msg" : "Good morning! Time to get moving!"
+        "msg" : "@channel Good morning! Time to get moving!"
     },
     {
         "time": "30 10 * * 1-5",

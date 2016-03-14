@@ -137,7 +137,7 @@ module.exports = (robot) ->
     msg.send message.join("\n")
 
   # Creating and updating users
-  #############################
+  ##############################
 
   robot.respond /add user (\S+[^-\s])$/i, (msg) ->
     username = msg.match[1].toLowerCase()

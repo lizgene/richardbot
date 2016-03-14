@@ -17,6 +17,10 @@ module.exports = (robot) ->
     message = "hello #{user}"
     msg.send message
 
+  robot.hear /where is everybody/, (msg) ->
+    message = "@channel, I'm here!"
+    msg.send message
+
   # Helper command with detailed instructions on how to make the most of richard
   robot.hear /how do i/i, (msg) ->
     message = "
