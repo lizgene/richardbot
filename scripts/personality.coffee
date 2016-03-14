@@ -20,7 +20,7 @@ module.exports = (robot) ->
   # Helper command with detailed instructions on how to make the most of richard
   robot.hear /how do i/i, (msg) ->
     message = "
-      Great question! Here some tips on how to use the exercise channel:\n\n
+      Great question! Here are some tips on how to use the exercise channel:\n\n
       *How to start/stop exercise notifications:*\n
       richard add [username]\n
         \tAdd yourself or friends to the exercise channel! You'll be added to our default fitness group to start.\n

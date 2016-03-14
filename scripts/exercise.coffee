@@ -55,8 +55,8 @@ class Exercise
     @robot.brain.data.users = @users
 
   activate: (username) ->
-    preferences = @users[username]
-    preferences.status = "active"
+    user = @users[username]
+    user.status = "active"
     @robot.brain.data.users = @users
 
   add: (username) ->
@@ -67,7 +67,7 @@ class Exercise
       "name" : username
       "score" : 0,
       "status" : "active",
-      "groups" : "fitness",
+      "groups" : ["fitness"],
       "last_exercised_at" : "TBD"
     }
     @robot.brain.data.users = @users
@@ -80,6 +80,7 @@ class Exercise
         user_list.push({
           name: name,
           score: preferences.score,
+          groups: preferences.groups,
           last_exercised_at: preferences.last_exercised_at,
         })
     return user_list
@@ -96,8 +97,11 @@ class Exercise
   getGroupUsers: (slug) ->
     # group = @groups.filter(group) ->
     #   group.slug == slug
-    # TODO: Implement new data model for users
-    return @users.keys
+    # TODO: Implement new data model for users and fix dit shit
+    usernames = []
+    for name, preferences of @users
+      usernames.push(name)
+    return usernames.join(" ")
 
   getRandomExercise: (slug) ->
     exercises = @exercises.filter (exercise) ->
@@ -109,16 +113,6 @@ class Exercise
 
 module.exports = (robot) ->
   richard = new Exercise robot
-
-  # Richard should explain himself
-  # May need to override help function in hubot
-  # Source: https://github.com/github/hubot/issues/844
-  ###############################
-
-  robot.hear /hello/, (msg) ->
-    user = msg.message.user.name
-    message = "hello #{user}"
-    msg.send message
 
   robot.respond /random/, (msg) ->
     message = ["Random Exercise:"]
@@ -153,7 +147,7 @@ module.exports = (robot) ->
   robot.respond /list users/i, (msg) ->
     message = ["The Springercisers:"]
     for user in richard.list()
-      message.push "#{user.name} - *Score:* #{user.score}, *Last Exercised:* #{user.last_exercised_at}"
+      message.push "#{user.name} - *Score:* #{user.score}, *Last Exercised:* #{user.last_exercised_at}, *Groups:* #{user.groups}"
     msg.send message.join("\n")
 
   robot.respond /terminate/, (msg) ->
@@ -172,12 +166,20 @@ module.exports = (robot) ->
     richard.increment user
     msg.send "#{user} #{richard.finishedResponse()}"
 
+  # robot.hear /yoga/i, (msg) ->
+  #   users = richard.getGroupUsers("fitness")
+  #   exercise = richard.getRandomExercise("fitness")
+  #   message = ["#{users} it's time to get moving!"]
+  #   message.push "#{exercise.title}"
+  #   message.push "#{exercise.description}"
+  #   robot.send { room: "exercise" }, message.join("\n")
+
   # Send automated exercise instructions per group
   #############################
 
-  robot.on "yoga", (msg) ->
-    users = richard.getGroupUsers("yoga")
-    exercise = richard.getRandomExercise("yoga")
+  robot.on "fitness", (msg) ->
+    users = richard.getGroupUsers("fitness")
+    exercise = richard.getRandomExercise("fitness")
     message = ["#{users} it's time to get moving!"]
     message.push "#{exercise.title}"
     message.push "#{exercise.description}"
