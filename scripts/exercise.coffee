@@ -130,25 +130,25 @@ module.exports = (robot) ->
       message.push "#{group.title} - #{group.description}"
     msg.send message.join("\n")
 
-  robot.respond /list exercises/, (msg) ->
-    message = ["All Exercises:"]
-    for exercise in richard.listExercises()
-      message.push "#{exercise.title} - #{exercise.description}"
-    msg.send message.join("\n")
+  # robot.respond /list exercises/, (msg) ->
+  #   message = ["All Exercises:"]
+  #   for exercise in richard.listExercises()
+  #     message.push "#{exercise.title} - #{exercise.description}"
+  #   msg.send message.join("\n")
 
   # Creating and updating users
   ##############################
 
-  robot.respond /add user (\S+[^-\s])$/i, (msg) ->
-    username = msg.match[1].toLowerCase()
-    richard.add username
-    msg.send "Added user: #{username}"
-
-  robot.respond /list users/i, (msg) ->
-    message = ["The Springercisers:"]
-    for user in richard.list()
-      message.push "#{user.name} - *Score:* #{user.score}, *Last Exercised:* #{user.last_exercised_at}, *Groups:* #{user.groups}"
-    msg.send message.join("\n")
+  # robot.respond /add user (\S+[^-\s])$/i, (msg) ->
+  #   username = msg.match[1].toLowerCase()
+  #   richard.add username
+  #   msg.send "Added user: #{username}"
+  #
+  # robot.respond /list users/i, (msg) ->
+  #   message = ["The Springercisers:"]
+  #   for user in richard.list()
+  #     message.push "#{user.name} - *Score:* #{user.score}, *Last Exercised:* #{user.last_exercised_at}, *Groups:* #{user.groups}"
+  #   msg.send message.join("\n")
 
   robot.respond /terminate/, (msg) ->
     message = ["Everybody up!!! It's time to exercise!!!!"]
@@ -156,15 +156,15 @@ module.exports = (robot) ->
       message.push "#{user.name}"
     msg.send message.join(" ")
 
-  robot.respond /remove (\S+[^-\s])$/i, (msg) ->
-    user = msg.match[1].toLowerCase()
-    richard.remove user
-    msg.send "Removed user: #{user}"
-
-  robot.hear /done/i, (msg)  ->
-    user = msg.message.user.name
-    richard.increment user
-    msg.send "#{user} #{richard.finishedResponse()}"
+  # robot.respond /remove (\S+[^-\s])$/i, (msg) ->
+  #   user = msg.match[1].toLowerCase()
+  #   richard.remove user
+  #   msg.send "Removed user: #{user}"
+  #
+  # robot.hear /done/i, (msg)  ->
+  #   user = msg.message.user.name
+  #   richard.increment user
+  #   msg.send "#{user} #{richard.finishedResponse()}"
 
   # robot.hear /yoga/i, (msg) ->
   #   users = richard.getGroupUsers("fitness")
