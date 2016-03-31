@@ -1,9 +1,13 @@
 # Description
-#   Adds and removes users from the exercisers list.
+#   Manages the exercisers list.
+#
+# Dependencies:
+#   "underscore": "^1.8.3"
 #
 # Commands:
 #   hubot add [me|username] - Add yourself or another member as an exerciser
-#   hubot [remove|stop|delete] [me|username]
+#   hubot stop - Remove yourself as an exerciser
+#   hubot done - Give yourself a point for exercising
 #   hubot list [members|users|exercisers] - List exercisers
 #
 # Notes:
@@ -11,130 +15,116 @@
 # Author:
 #   liz hubertz
 
+_ = require("underscore")
+
 class Exerciser
 
   constructor: (@robot) ->
 
-  # Set cache for hubot to save user data
-  @exercisers = []
-  @robot.brain.on 'loaded', =>
-    if @robot.brain.data.exercisers
-      @exercisers = @robot.brain.data.exercisers
+    # Set cache for hubot to save user data
+    @exercisers = []
+    @robot.brain.on 'loaded', =>
+      if @robot.brain.data.exercisers
+        @exercisers = @robot.brain.data.exercisers
 
- # Updates the brain
- updateBrain = (exercisers) ->
-   @robot.brain.data.exercisers = exercisers
+   # Updates the brain
+   updateBrain: (exercisers) ->
+     @robot.brain.data.exercisers = exercisers
 
-  # Return all exercisers
-  getExercisers = ->
-    @exercisers
+    # Return all exercisers
+    getExercisers: ->
+      _.where @exercisers, status: "active"
 
-  # Get specific exercisers
-  getExerciser = (username) ->
-    _.where @exercisers, name: username
+    # Get specific exerciser
+    getExerciser: (username) ->
+      _.where @exercisers, name: username
 
-  removeExerciser = (username) ->
-    for exerciser in @exercisers
-      exerciser.status = "inactive" if exerciser.name == username
-    updateBrain(@exercisers)
+    removeExerciser: (username) ->
+      for exerciser in @exercisers
+        exerciser.status = "inactive" if exerciser.name == username
+      @updateBrain(@exercisers)
 
-  activateExerciser = (username) ->
-    for exerciser in @exercisers
-      exerciser.status = "active" if exerciser.name == username
+    # Add a new exerciser or activate one who already exists.
+    addExerciser: (username) ->
+      exerciser = @getExerciser(username)
+      if exerciser.count > 1
+        exerciser.status = "active"
+        return
 
-  # Add a new exerciser or activate one who already exists.
-  addExerciser = (username) ->
-    activateExerciser(username) if getExerciser(username)
+      else
+        new_exerciser = {
+          name: username,
+          status: "active",
+          score: 0,
+          groups: ["fitness"],
+          last_exercised_at: "TBD"
+        }
+        @exercisers.push(new_exerciser)
+        @updateBrain(@exercisers)
 
-    new_exerciser = {
-      name: username,
-      status: "active",
-      score: 0,
-      groups: ["fitness"],
-      last_exercised_at: "TBD"
-    }
-    @exercisers.push(new_exerciser)
-    updateBrain(@exercisers)
+    # Get a point for exercising!
+    levelUp: (username) ->
+      # Add or update exerciser in case they don't exist or are inactive.
+      @addExerciser(username)
+      for exerciser in @exercisers
+        if exerciser.name == username
+          exerciser.score += 1
+          exerciser.last_exercised_at = new Date().toUTCString()
+      @updateBrain(@exercisers)
 
-  # Get a point for exercising!
-  levelUp = (username) ->
-    # Add or update exerciser in case they don't exist or are inactive.
-    @addExerciser(username)
-    for exerciser in @exercisers
-      if exerciser.name == username
-        exerciser.score += 1
-        exerciser.last_exercised_at = new Date().toUTCString()
-    updateBrain(@exercisers)
+    # Send a happy response when a user finishes an exercise
+    @kudos = [
+      "is fabuloooous!",
+      "twerk it gurl!",
+      "has abs of STEEL",
+      "has thighs of STEEL",
+      "is a maaaaniac, MAAANIAC!",
+      "didn't get that ass by sitting all day!",
+      "FELT THE BURN",
+      "woke up. worked out. kicked ass."
+    ]
+    kudos: ->
+      @kudos[Math.floor(Math.random() * @kudos.length)]
 
 module.exports = (robot) ->
-  richard = new Exerciser robot
+  exerciser_bot = new Exerciser robot
 
-  # Listing groups and exercises
+  # Create and removing exercisers
   ##############################
 
-  robot.respond /list groups/, (msg) ->
-    message = ["All Groups:"]
-    for group in richard.listGroups()
-      message.push "#{group.title} - #{group.description}"
-    msg.send message.join("\n")
+  robot.respond /add (\S+[^-\s])$/i, (msg) ->
+    current_user = msg.message.user.name
+    added_user = msg.match[1].toLowerCase()
 
-  robot.respond /list exercises/, (msg) ->
-    message = ["All Exercises:"]
-    for exercise in richard.listExercises()
-      message.push "#{exercise.title} - #{exercise.description}"
-    msg.send message.join("\n")
+    if (current_user != added_user) && (added_user != "me")
+      message = "#{current_user} you sneaky snake. I'll add #{added_user}, but just this once. ;-)"
+      exerciser_bot.addExerciser(added_user)
+    else
+      message = "Awesome, #{current_user}, you are added to my list!"
+      exerciser_bot.addExerciser(current_user)
 
-  # Creating and updating users
+    msg.send message
+
+  robot.respond /stop$/i, (msg) ->
+    current_user = msg.message.user.name
+    message = "#{current_user}, sorry to see you go. Come back any time!"
+    exerciser_bot.removeExerciser(current_user)
+
+    msg.send message
+
+  # Update exercisers
   ##############################
-
-  robot.respond /add user (\S+[^-\s])$/i, (msg) ->
-    username = msg.match[1].toLowerCase()
-    richard.add username
-    msg.send "Added user: #{username}"
-
-  robot.respond /list users/i, (msg) ->
-    message = ["The Springercisers:"]
-    for user in richard.list()
-      message.push "#{user.name} - *Score:* #{user.score}, *Last Exercised:* #{user.last_exercised_at}, *Groups:* #{user.groups}"
-    msg.send message.join("\n")
-
-  robot.respond /terminate/, (msg) ->
-    message = ["Everybody up!!! It's time to exercise!!!!"]
-    for user, rank in richard.list()
-      message.push "#{user.name}"
-    msg.send message.join(" ")
-
-  robot.respond /remove (\S+[^-\s])$/i, (msg) ->
-    user = msg.match[1].toLowerCase()
-    richard.remove user
-    msg.send "Removed user: #{user}"
 
   robot.hear /done/i, (msg)  ->
-    user = msg.message.user.name
-    richard.increment user
-    msg.send "#{user} #{richard.finishedResponse()}"
+    current_user = msg.message.user.name
+    exerciser_bot.levelUp(current_user)
+    msg.send "#{current_user} #{exerciser_bot.kudos()}"
 
-  # robot.hear /yoga/i, (msg) ->
-  #   users = richard.getGroupUsers("fitness")
-  #   exercise = richard.getRandomExercise("fitness")
-  #   message = ["#{users} it's time to get moving!"]
-  #   message.push "#{exercise.title}"
-  #   message.push "#{exercise.description}"
-  #   robot.send { room: "exercise" }, message.join("\n")
+  # List exercisers
+  ##############################
 
-  # Send automated exercise instructions per group
-  #############################
-
-  robot.on "fitness", (msg) ->
-    users = richard.getGroupUsers("fitness")
-    exercise = richard.getRandomExercise("fitness")
-    message = ["#{users} it's time to get moving!"]
-    message.push "#{exercise.title}"
-    message.push "#{exercise.description}"
-    robot.send { room: "exercise" }, message.join("\n")
-
-  robot.on ".+", (group_name) ->
-    message = ["This is a fully automated exercise reminder for #{group_name}."]
-    # for user, rank in richard.list()
-    #   message.push "#{user.name}"
-    robot.send { room: "exercise" }, message.join(" ")
+  robot.respond /list/i, (msg) ->
+    message = ["The Springercisers:"]
+    for user in exerciser_bot.getExercisers()
+      message.push "#{user.name} - *Score:* #{user.score}, *Last Exercised:* #{user.last_exercised_at}, *Groups:* #{user.groups}, *Status:* #{user.status}"
+    msg.send message.join("\n")
