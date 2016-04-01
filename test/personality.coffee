@@ -12,7 +12,7 @@ expect = require('chai').expect
 co = require('co')
 
 # helper loads a specific script if it's a file
-helper = new Helper('./../scripts/exercise.coffee')
+helper = new Helper('./../scripts/personality.coffee')
 
 describe 'hello', ->
 
@@ -22,13 +22,13 @@ describe 'hello', ->
   afterEach ->
     @room.destroy()
 
-  context 'when adding a user', ->
+  context 'user says hi to robot', ->
     beforeEach ->
       co =>
-        yield @room.user.say 'alice', 'hubot add me'
+        yield @room.user.say 'alice', 'hubot hello'
         yield @room.user.say 'bob',   'hubot hello'
 
-    it 'user adds themselves', ->
+    it 'should reply to user', ->
       expect(@room.messages).to.eql [
         ['alice', 'hubot hello']
         ['hubot', 'hello alice']
@@ -45,4 +45,15 @@ describe 'hello', ->
       expect(@room.messages).to.eql [
         ['alice', 'where is everybody?']
         ['hubot', "@channel, I'm here!"]
+      ]
+
+  context 'user says how do i...', ->
+    beforeEach ->
+      co =>
+        yield @room.user.say 'alice', 'how do i do this?'
+
+    it 'should reply to user', ->
+      expect(@room.messages).to.eql [
+        ['alice', 'how do i do this?']
+        ['hubot', "I have no idea. Geen idea!"]
       ]
