@@ -80,11 +80,10 @@ class Exerciser
   # Get a point for exercising!
   levelUp: (username) ->
     # Add or update exerciser in case they don't exist or are inactive.
-    @addExerciser(username)
-    for exerciser in @exercisers
-      if exerciser.name == username
-        exerciser.score += 1
-        exerciser.last_exercised_at = new Date().toUTCString()
+    @addExerciser(username) if !@getExerciser(username)
+    exerciser = @getExerciser(username)
+    exerciser.score +=1
+    exerciser.last_exercised_at = new Date().toUTCString()
     @updateBrain(@exercisers)
 
   # Send a happy response when a user finishes an exercise
